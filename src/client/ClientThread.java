@@ -29,9 +29,10 @@ public class ClientThread extends Thread {
     //
     private Timer HeartBeat;
 
-    public ClientThread(String ServerIP, int ServerPort) throws Exception {
+    public ClientThread(String ServerIP, int ServerPort,String name) throws Exception {
+        super(name + "->" + "ClientThread");
         //
-        socketThread = new SocketThread(ServerIP, ServerPort, "ClientThread");
+        socketThread = new SocketThread(ServerIP, ServerPort, getName());
         //
         requests = new Vector<>();
         responses = new Vector<>();

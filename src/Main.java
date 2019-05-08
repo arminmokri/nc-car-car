@@ -24,7 +24,8 @@ public class Main {
 
             ClientThread clientThread = new ClientThread(
                     config.getServer().getHostAddress(),
-                    config.getServer().getPort()
+                    config.getServer().getPort(),
+                    "Main"
             );
             clientThread.start();
         } catch (Exception exception) {
