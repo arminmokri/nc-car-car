@@ -4,6 +4,7 @@ import client.request.Request;
 import client.response.Response;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Vector;
 import javax.swing.Timer;
 
@@ -20,14 +21,11 @@ public class ClientThread extends Thread {
 
     //
     private SocketThread socketThread;
+    //
     private Vector<Request> requests;
     private Vector<Response> responses;
-    //RequestThread requestThread;
-    //ResponseThread responseThread;
-    private boolean Running;
     //
-    //private Vector<Request> requests;
-    //private Vector<ResponseThread> responses;
+    private boolean Running;
     //
     private Timer HeartBeat;
 
@@ -41,12 +39,12 @@ public class ClientThread extends Thread {
         HeartBeat = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 try {
-                    Request heartBeat = new Request(Request.REQ_HEARTBEAT);
+                    Request heartBeat = new Request(Request.HEARTBEAT);
                     Request(heartBeat);
-                    String ans = heartBeat.getAnswer();
-                    if (!ans.equals(Request.REQ_HEARTBEAT_YES)) {
+                    String ans = new String(heartBeat.getAnswer());
+                    //System.out.println(ans);
+                    if (!ans.equals(Response.HEARTBEAT_YES)) {
                         Stop();
                     }
                 } catch (Exception exception) {
@@ -62,22 +60,27 @@ public class ClientThread extends Thread {
 
         while (this.isRunning()) {
             try {
-                while (!socketThread.getStringDataInputStream().isEmpty()) {
+                while (!socketThread.getBytesDataInputStream().isEmpty()) {
 
-                    String data = socketThread.getStringDataInputStream().remove(0);
+                    byte[] data = socketThread.getBytesDataInputStream().remove(0);
+                    //System.out.println(Arrays.toString(data));
 
-                    switch (data.charAt(0)) {
-                        case Response.RESPONSE:
-                            Response response = new Response(data);
-                            this.socketThread.getDataOutputStream().writeUTF(response.toString());
+                    switch (data[0]) {
+                        case Header.REQUEST:
+                            Request request_temp = new Request(data);
+                            Response response = new Response(
+                                    request_temp.getHeader(), request_temp.getRequest()
+                            );
+                            socketThread.dataOutputStreamWrite(response.getBytes());
                             break;
-                        case Request.ACT_REQUEST:
-                            String ticket_temp = Request.getTicket(data);
-                            String answer_temp = Request.getAnswer(data);
+                        case Header.RESPONSE:
+                            Response response_temp = new Response(data);
                             for (int i = 0; i < requests.size(); i++) {
-                                if (ticket_temp.equals(requests.get(i).getTicket())) {
-                                    Request request = requests.remove(i);
-                                    request.setAnswer(answer_temp);
+                                Request request = requests.get(i);
+                                if (response_temp.getHeader().getTicket().equals(
+                                        request.getHeader().getTicket())) {
+                                    requests.remove(request);
+                                    request.setAnswer(response_temp.getAnswer());
                                     break;
                                 }
                             }
@@ -101,9 +104,9 @@ public class ClientThread extends Thread {
         if (!this.isRunning()) {
             this.setRunning(true);
             //
-            socketThread.start();
+            super.start();
             //
-            this.start();
+            socketThread.start();
             //
             HeartBeat.start();
         }
@@ -114,12 +117,6 @@ public class ClientThread extends Thread {
             this.setRunning(false);
 
             try {
-                this.stop();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-
-            try {
                 HeartBeat.stop();
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -127,6 +124,12 @@ public class ClientThread extends Thread {
 
             try {
                 socketThread.Stop();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+
+            try {
+                this.stop();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -144,10 +147,9 @@ public class ClientThread extends Thread {
     public void Request(Request request) {
         try {
             requests.add(request);
-            socketThread.getDataOutputStream().writeBytes(request.toString());
+            socketThread.dataOutputStreamWrite(request.getBytes());
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
-
 }

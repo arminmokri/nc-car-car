@@ -7,8 +7,11 @@ package client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Vector;
 
 /**
@@ -20,22 +23,28 @@ public class SocketThread extends Thread {
     //
     private final InetAddress ServerInetAddress;
     private final int ServerPort;
+    private final int bytesSize;
     //
     private final Socket socket;
     private final DataInputStream dataInputStream;
     private final DataOutputStream dataOutputStream;
     //
-    private Vector<String> stringDataInputStream;
+    private Vector<byte[]> bytesDataInputStream;
     //
     private boolean Running;
 
     public SocketThread(String ServerIP, int ServerPort, String name) throws Exception {
+        this(ServerIP, ServerPort, 8 * 1024, name);
+    }
+
+    public SocketThread(String ServerIP, int ServerPort, int bytesSize, String name) throws Exception {
         super(name + "->" + "SocketThread");
         //
         this.ServerInetAddress = InetAddress.getByName(ServerIP);
         this.ServerPort = ServerPort;
+        this.bytesSize = bytesSize;
         //
-        this.stringDataInputStream = new Vector<>();
+        this.bytesDataInputStream = new Vector<>();
         //
         this.socket = new Socket(this.ServerInetAddress, this.ServerPort);
         //
@@ -46,14 +55,17 @@ public class SocketThread extends Thread {
 
     @Override
     public void run() {
-        String data;
         while (this.isRunning()) {
             try {
-                data = dataInputStream.readLine();
-                if (data != null && data.length() > 0) {
-                    stringDataInputStream.add(data);
-                    data = null;
+                int count;
+                byte[] bytes = new byte[bytesSize];
+                if ((count = dataInputStream.read(bytes)) > 0) {
+                    bytesDataInputStream.add(Arrays.copyOfRange(bytes, 0, count));
                 }
+
+            } catch (EOFException exception) {
+                exception.printStackTrace();
+                Stop();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -73,12 +85,6 @@ public class SocketThread extends Thread {
             this.setRunning(false);
 
             try {
-                super.stop();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-
-            try {
                 dataInputStream.close();
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -92,6 +98,12 @@ public class SocketThread extends Thread {
 
             try {
                 socket.close();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+
+            try {
+                super.stop();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -114,12 +126,12 @@ public class SocketThread extends Thread {
         return dataInputStream;
     }
 
-    protected synchronized DataOutputStream getDataOutputStream() {
-        return dataOutputStream;
+    protected synchronized void dataOutputStreamWrite(byte[] bytes) throws IOException {
+        dataOutputStream.write(bytes);
     }
 
-    protected Vector<String> getStringDataInputStream() {
-        return stringDataInputStream;
+    protected Vector<byte[]> getBytesDataInputStream() {
+        return bytesDataInputStream;
     }
 
 }

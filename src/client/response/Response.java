@@ -5,38 +5,59 @@
  */
 package client.response;
 
+import client.Header;
+import client.request.Request;
+import com.sun.xml.internal.ws.util.ByteArrayBuffer;
+import java.io.IOException;
+import java.util.Arrays;
+
 /**
  *
  * @author armin
  */
 public class Response {
 
-    // response value
-    public static final char RESPONSE = 0x03;
-    public static final char ACT_RESPONSE = 0x04;
     //
-    public static final char REQ_Username = 0x01;
+    public static final String HEARTBEAT_YES = "YES";
+    public static final String NO_ANSWER = "NO ANSWER";
     //
-    private String ticket;
-    private char response;
-    private String answer;
+    private Header header;
+    private byte[] answer;
 
-    public Response(String response) {
-        this.response = response.charAt(1);
-        ticket = response.substring(2, 12);
-        if (this.response == Response.REQ_Username) {
-            //this.answer = Global.getMember().getUsername();
+    public Response(Header header, byte request) {
+        this.header = header;
+        this.header.setType(Header.RESPONSE);
+        setAnswer(request);
+    }
+
+    public Response(byte[] bytes) {
+        this.header = new Header(Header.RESPONSE, bytes);
+        this.answer = Arrays.copyOfRange(bytes, 11, bytes.length);
+    }
+
+    private void setAnswer(byte request) {
+        if (request == Request.HEARTBEAT) {
+            this.answer = Response.HEARTBEAT_YES.getBytes();
         } else {
-            System.err.println("NO ANSWER :( " + this.response);
+            String answer = Response.NO_ANSWER + ", For This Request Code " + (int) request;
+            this.answer = answer.getBytes();
+            System.err.println(answer);
         }
     }
 
-    @Override
-    public String toString() {
-        String string = "";
-        string = string + Response.ACT_RESPONSE;
-        string = string + ticket;
-        string = string + answer;
-        return string;
+    public Header getHeader() {
+        return header;
     }
+
+    public byte[] getAnswer() {
+        return answer;
+    }
+
+    public byte[] getBytes() throws IOException {
+        ByteArrayBuffer byteArrayBuffer = new ByteArrayBuffer(100);
+        byteArrayBuffer.write(header.getBytes());
+        byteArrayBuffer.write(getAnswer());
+        return byteArrayBuffer.toByteArray();
+    }
+
 }
