@@ -53,6 +53,26 @@ public class SocketThread extends Thread {
 
     }
 
+    public SocketThread(Socket socket, String name) throws Exception {
+        this(socket, 8 * 1024, name);
+    }
+
+    public SocketThread(Socket socket, int bytesSize, String name) throws Exception {
+        super(name + "->" + "SocketThread");
+        //
+        this.ServerInetAddress = socket.getInetAddress();
+        this.ServerPort = socket.getPort();
+        this.bytesSize = bytesSize;
+        //
+        this.bytesDataInputStream = new Vector<>();
+        //
+        this.socket = socket;
+        //
+        this.dataInputStream = new DataInputStream(this.socket.getInputStream());
+        this.dataOutputStream = new DataOutputStream(this.socket.getOutputStream());
+
+    }
+
     @Override
     public void run() {
         while (this.isRunning()) {
@@ -116,14 +136,6 @@ public class SocketThread extends Thread {
 
     protected void setRunning(boolean Running) {
         this.Running = Running;
-    }
-
-    protected InetAddress getServerInetAddress() {
-        return ServerInetAddress;
-    }
-
-    protected synchronized DataInputStream getDataInputStream() {
-        return dataInputStream;
     }
 
     protected synchronized void dataOutputStreamWrite(byte[] bytes) throws IOException {
