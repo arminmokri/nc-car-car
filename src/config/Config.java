@@ -25,7 +25,9 @@ public class Config {
 
     private Options Options;
     private File Config;
+    //
     private Server Server;
+    private Car car;
 
     public Config(String[] args) {
         this.Options = new Options();
@@ -76,10 +78,19 @@ public class Config {
         this.Server.setPort(iNIConfiguration.getSection("server").getInt("port"));
         this.Server.setHostAddress(iNIConfiguration.getSection("server").getString("host"));
 
+        // set car
+        this.car = new Car();
+        this.car.setUsername(iNIConfiguration.getSection("car").getString("username"));
+        this.car.setPassword(iNIConfiguration.getSection("car").getString("password"));
+
     }
 
     public Server getServer() {
         return Server;
+    }
+
+    public Car getCar() {
+        return car;
     }
 
 }

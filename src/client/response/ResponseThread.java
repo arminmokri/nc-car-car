@@ -26,7 +26,7 @@ public class ResponseThread extends Thread {
     @Override
     public void run() {
         try {
-            Response response = new Response(request.getHeader(), request.getRequest(), clientThread);
+            Response response = new Response(request, clientThread);
             clientThread.dataOutputStreamWrite(response.getBytes());
         } catch (IOException iOException) {
             iOException.printStackTrace();
