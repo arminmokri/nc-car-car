@@ -63,15 +63,15 @@ public class Response {
     }
 
     public final void setResponseParameters() {
-        String action = requestParameters.getParameterValue(Parameter.ACTION);
+        String action = requestParameters.getValue(Parameter.ACTION);
         switch (action) {
             case Parameter.HEARTBEAT:
-                responseParameters.addParameter(Parameter.RESULT, Parameter.RESULT_1);
+                responseParameters.add(Parameter.RESULT, Parameter.RESULT_1);
                 break;
             default:
                 String string = Parameter.NO_ANSWER + ", For This Request Action: " + action;
-                responseParameters.addParameter(Parameter.RESULT, Parameter.RESULT_0);
-                responseParameters.addParameter(Parameter.MESSAGE, string);
+                responseParameters.add(Parameter.RESULT, Parameter.RESULT_0);
+                responseParameters.add(Parameter.MESSAGE, string);
                 System.err.println(string);
                 break;
         }
