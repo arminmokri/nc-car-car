@@ -5,12 +5,14 @@
  */
 package client.response;
 
+import global.GlobalVariable;
 import client.ClientThread;
 import client.Header;
 import client.parameters.Parameter;
 import client.parameters.Parameters;
 import client.request.Request;
 import com.sun.xml.internal.ws.util.ByteArrayBuffer;
+import config.Car;
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;
@@ -63,17 +65,26 @@ public class Response {
     }
 
     public final void setResponseParameters() {
-        String action = requestParameters.getValue(Parameter.ACTION);
-        switch (action) {
-            case Parameter.HEARTBEAT:
-                responseParameters.add(Parameter.RESULT, Parameter.RESULT_1);
-                break;
-            default:
-                String string = Parameter.NO_ANSWER + ", For This Request Action: " + action;
-                responseParameters.add(Parameter.RESULT, Parameter.RESULT_0);
-                responseParameters.add(Parameter.MESSAGE, string);
-                System.err.println(string);
-                break;
+        try {
+            String action = requestParameters.getValue(Parameter.ACTION);
+            switch (action) {
+                case Parameter.HEARTBEAT: {
+                    responseParameters.add(Parameter.RESULT, Parameter.RESULT_1);
+                    break;
+                }
+                default: {
+                    String string = Parameter.NO_ANSWER + ", For This Request Action: " + action;
+                    responseParameters.add(Parameter.RESULT, Parameter.RESULT_0);
+                    responseParameters.add(Parameter.MESSAGE, string);
+                    System.err.println(string);
+                    break;
+                }
+            }
+        } catch (Exception exception) {
+            String string = Parameter.ERROR + ", " + exception.getMessage();
+            responseParameters.add(Parameter.RESULT, Parameter.RESULT_0);
+            responseParameters.add(Parameter.MESSAGE, string);
+            System.err.println(string);
         }
     }
 

@@ -26,10 +26,10 @@ public class Main {
 
         GlobalVariable.config = new Config(args);
         try {
-
+            
             String hostAddress = GlobalVariable.config.getServer().getHostAddress();
             int port = GlobalVariable.config.getServer().getPort();
-
+            
             GlobalVariable.clientThread = new ClientThread(
                     hostAddress,
                     port,
@@ -37,23 +37,24 @@ public class Main {
             );
             GlobalVariable.clientThread.start();
 
-            /*
             // test register
             String username = GlobalVariable.config.getCar().getUsername();
             String password = GlobalVariable.config.getCar().getPassword();
             //
             Parameters parameters = new Parameters();
-            parameters.addParameter(Parameter.ACTION, Parameter.REGISTER);
-            parameters.addParameter(Parameter.TYPE, Parameter.TYPE_CAR);
-            parameters.addParameter(Parameter.USERNAME, username);
-            parameters.addParameter(Parameter.PASSWORD, password);
+            parameters.add(Parameter.ACTION, Parameter.REGISTER);
+            parameters.add(Parameter.TYPE, Parameter.TYPE_CAR);
+            parameters.add(Parameter.USERNAME, username);
+            parameters.add(Parameter.PASSWORD, password);
             Request register = new Request(parameters);
             GlobalVariable.clientThread.Request(register);
-            System.out.println(register.getResponseParameters().getJsonString());
-            System.exit(0);
-             */
+            String result = register.getResponseParameters().getValue("result");
+            if (!result.equals(Parameter.RESULT_1)) {
+                throw new Exception(register.getResponseParameters().getValue("message"));
+            }
         } catch (Exception exception) {
             exception.printStackTrace();
+            System.exit(1);
         }
     }
 }
