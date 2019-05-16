@@ -26,6 +26,8 @@ public class Config {
     private Options Options;
     private File Config;
     //
+    private boolean debugMode;
+    private boolean simulationMode;
     private Server Server;
     private Car car;
 
@@ -73,6 +75,10 @@ public class Config {
         INIConfiguration iNIConfiguration = new INIConfiguration();
         iNIConfiguration.read(new FileReader(this.Config));
 
+        // set genral
+        this.simulationMode = iNIConfiguration.getSection("genral").getBoolean("simulation_mode");
+        this.debugMode = iNIConfiguration.getSection("genral").getBoolean("debug_mode");
+
         // set server
         this.Server = new Server();
         this.Server.setPort(iNIConfiguration.getSection("server").getInt("port"));
@@ -83,6 +89,14 @@ public class Config {
         this.car.setUsername(iNIConfiguration.getSection("car").getString("username"));
         this.car.setPassword(iNIConfiguration.getSection("car").getString("password"));
 
+    }
+
+    public boolean isSimulationMode() {
+        return simulationMode;
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
     }
 
     public Server getServer() {

@@ -15,6 +15,7 @@ import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 import config.Car;
 import java.io.IOException;
 import java.util.Arrays;
+import key.KeyEvent;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -70,6 +71,35 @@ public class Response {
             switch (action) {
                 case Parameter.HEARTBEAT: {
                     responseParameters.add(Parameter.RESULT, Parameter.RESULT_1);
+                    break;
+                }
+                case Parameter.KEY: {
+                    //
+                    String key_code_string = requestParameters.getValue(Parameter.KEY_CODE);
+                    int key_code = Integer.parseInt(key_code_string);
+                    //
+                    String key_event_string = requestParameters.getValue(Parameter.KEY_EVENT);
+                    KeyEvent.Event key_event = KeyEvent.Event.valueOf(key_event_string);
+                    //
+                    String key_mode_string = requestParameters.getValue(Parameter.KEY_MODE);
+                    KeyEvent.Mode key_mode = KeyEvent.Mode.valueOf(key_mode_string);
+                    //
+                    String heartbeat_interval_string = requestParameters.getValue(Parameter.KEY_HEARTBEAT_INTERVAL);
+                    int heartbeat_interval = 0;
+                    if (heartbeat_interval_string != null) {
+                        heartbeat_interval = Integer.parseInt(heartbeat_interval_string);
+                    }
+                    //
+                    String heartbeat_wait_time_string = requestParameters.getValue(Parameter.KEY_HEARTBEAT_INTERVAL);
+                    int heartbeat_wait_time = 0;
+                    if (heartbeat_wait_time_string != null) {
+                        heartbeat_wait_time = Integer.parseInt(heartbeat_wait_time_string);
+                    }
+                    //
+                    KeyEvent keyEvent = new KeyEvent(key_mode, key_code, key_event, heartbeat_interval, heartbeat_wait_time);
+                    GlobalVariable.keysEventDispatcher.dispatchKeyEvent(keyEvent);
+                    responseParameters.add(Parameter.RESULT, Parameter.RESULT_1);
+                    responseParameters.add(Parameter.MESSAGE, key_event + " key code: " + key_code);
                     break;
                 }
                 default: {

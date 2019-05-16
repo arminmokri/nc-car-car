@@ -11,6 +11,8 @@ import client.parameters.Parameter;
 import client.parameters.Parameters;
 import client.request.Request;
 import config.Config;
+import drive.Driver;
+import key.KeysEventDispatcherThread;
 
 /**
  *
@@ -26,10 +28,10 @@ public class Main {
 
         GlobalVariable.config = new Config(args);
         try {
-            
+
             String hostAddress = GlobalVariable.config.getServer().getHostAddress();
             int port = GlobalVariable.config.getServer().getPort();
-            
+
             GlobalVariable.clientThread = new ClientThread(
                     hostAddress,
                     port,
@@ -37,10 +39,10 @@ public class Main {
             );
             GlobalVariable.clientThread.start();
 
-            // test register
+            //
             String username = GlobalVariable.config.getCar().getUsername();
             String password = GlobalVariable.config.getCar().getPassword();
-            //
+            // register
             Parameters parameters = new Parameters();
             parameters.add(Parameter.ACTION, Parameter.REGISTER);
             parameters.add(Parameter.TYPE, Parameter.TYPE_CAR);
@@ -49,10 +51,23 @@ public class Main {
             Request register = new Request(parameters);
             GlobalVariable.clientThread.Request(register);
             String result = register.getResponseParameters().getValue("result");
-            if (!result.equals(Parameter.RESULT_1)) {
+            if (result.equals(Parameter.RESULT_1)) {
+                GlobalVariable.driver = new Driver();
+                GlobalVariable.keysEventDispatcher = new KeysEventDispatcherThread();
+                GlobalVariable.keysEventDispatcher.start();
+            } else {
                 throw new Exception(register.getResponseParameters().getValue("message"));
             }
         } catch (Exception exception) {
+            if (GlobalVariable.clientThread != null) {
+                GlobalVariable.clientThread.Stop();
+            }
+            if (GlobalVariable.keysEventDispatcher != null) {
+                GlobalVariable.keysEventDispatcher.Stop();
+            }
+            if (GlobalVariable.driver != null) {
+                GlobalVariable.driver.stop();
+            }
             exception.printStackTrace();
             System.exit(1);
         }
