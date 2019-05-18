@@ -25,28 +25,29 @@ public class KeysEventDispatcherThread extends Thread implements KeyEventDispatc
     public void run() {
         while (this.isRunning()) {
             try {
-                while (!keyEvents.isEmpty()) {
-                    KeyEvent keyEvent = keyEvents.firstElement();
+                for (Object object : keyEvents) {
+                    KeyEvent keyEvent = (KeyEvent) object;
                     if (keyEvent.isExpire()) {
-                        keyEvents.remove(keyEvent);
-                        switch (keyEvent.getCode()) {
-                            case java.awt.event.KeyEvent.VK_UP:
-                                global.GlobalVariable.driver.stopForward();
-                                break;
-                            case java.awt.event.KeyEvent.VK_DOWN:
-                                global.GlobalVariable.driver.stopBackward();
-                                break;
-                            case java.awt.event.KeyEvent.VK_LEFT:
-                                global.GlobalVariable.driver.stopLeft();
-                                break;
-                            case java.awt.event.KeyEvent.VK_RIGHT:
-                                global.GlobalVariable.driver.stopRight();
-                                break;
-                            case java.awt.event.KeyEvent.VK_C:
-                                break;
-                            default:
-                                break;
+                        if (keyEvents.remove(keyEvent)) {
+                            switch (keyEvent.getCode()) {
+                                case java.awt.event.KeyEvent.VK_UP:
+                                    global.GlobalVariable.driver.stopForward();
+                                    break;
+                                case java.awt.event.KeyEvent.VK_DOWN:
+                                    global.GlobalVariable.driver.stopBackward();
+                                    break;
+                                case java.awt.event.KeyEvent.VK_LEFT:
+                                    global.GlobalVariable.driver.stopLeft();
+                                    break;
+                                case java.awt.event.KeyEvent.VK_RIGHT:
+                                    global.GlobalVariable.driver.stopRight();
+                                    break;
+                                case java.awt.event.KeyEvent.VK_C:
+                                    break;
+                                default:
+                                    break;
 
+                            }
                         }
                     }
                 }

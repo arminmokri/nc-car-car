@@ -38,16 +38,20 @@ public class Driver {
 
     public void startForward() {
         stopBackward();
-        if (!global.GlobalVariable.config.isSimulationMode() && forward.isLow()) {
-            forward.high();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (forward.isLow()) {
+                forward.high();
+            }
         } else {
             System.out.println("startForward");
         }
     }
 
     public void stopForward() {
-        if (!global.GlobalVariable.config.isSimulationMode() && forward.isHigh()) {
-            forward.low();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (forward.isHigh()) {
+                forward.low();
+            }
         } else {
             System.out.println("stopForward");
         }
@@ -55,16 +59,20 @@ public class Driver {
 
     public void startBackward() {
         stopForward();
-        if (!global.GlobalVariable.config.isSimulationMode() && backward.isLow()) {
-            backward.high();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (backward.isLow()) {
+                backward.high();
+            }
         } else {
             System.out.println("startBackward");
         }
     }
 
     public void stopBackward() {
-        if (!global.GlobalVariable.config.isSimulationMode() && backward.isHigh()) {
-            backward.low();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (backward.isHigh()) {
+                backward.low();
+            }
         } else {
             System.out.println("stopBackward");
         }
@@ -72,16 +80,20 @@ public class Driver {
 
     public void startLeft() {
         stopRight();
-        if (!global.GlobalVariable.config.isSimulationMode() && left.isLow()) {
-            left.high();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (left.isLow()) {
+                left.high();
+            }
         } else {
             System.out.println("startLeft");
         }
     }
 
     public void stopLeft() {
-        if (!global.GlobalVariable.config.isSimulationMode() && left.isHigh()) {
-            left.low();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (left.isHigh()) {
+                left.low();
+            }
         } else {
             System.out.println("stopLeft");
         }
@@ -89,16 +101,20 @@ public class Driver {
 
     public void startRight() {
         stopLeft();
-        if (!global.GlobalVariable.config.isSimulationMode() && right.isLow()) {
-            right.high();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (right.isLow()) {
+                right.high();
+            }
         } else {
             System.out.println("startRight");
         }
     }
 
     public void stopRight() {
-        if (!global.GlobalVariable.config.isSimulationMode() && right.isHigh()) {
-            right.low();
+        if (!global.GlobalVariable.config.isSimulationMode()) {
+            if (right.isHigh()) {
+                right.low();
+            }
         } else {
             System.out.println("stopRight");
         }
