@@ -11,6 +11,7 @@ import client.Header;
 import client.parameters.Parameter;
 import client.parameters.Parameters;
 import client.request.Request;
+import client.transfer.TransferProtocol;
 import java.io.ByteArrayOutputStream;
 import config.Car;
 import java.io.IOException;
@@ -25,29 +26,18 @@ import org.json.simple.parser.ParseException;
 public class Response {
 
     //
+    private TransferProtocol transferProtocol;
     private Header header;
     private Parameters requestParameters;
     private Parameters responseParameters;
     //
     private ClientThread clientThread;
 
-    public Response(Request request) {
-        this(request.getHeader(), request.getRequestParameters());
+    public Response(TransferProtocol transferProtocol, Request request, ClientThread clientThread) {
+        this(transferProtocol, request.getHeader(), request.getRequestParameters(), clientThread);
     }
 
-    public Response(Header header, Parameters requestParameters) {
-        this.header = header;
-        this.header.setType(Header.RESPONSE);
-        this.requestParameters = requestParameters;
-        this.responseParameters = new Parameters();
-        setResponseParameters();
-    }
-
-    public Response(Request request, ClientThread clientThread) {
-        this(request.getHeader(), request.getRequestParameters(), clientThread);
-    }
-
-    public Response(Header header, Parameters requestParameters, ClientThread clientThread) {
+    public Response(TransferProtocol transferProtocol, Header header, Parameters requestParameters, ClientThread clientThread) {
         this.header = header;
         this.header.setType(Header.RESPONSE);
         this.requestParameters = requestParameters;
@@ -124,6 +114,10 @@ public class Response {
 
     public Header getHeader() {
         return header;
+    }
+
+    public TransferProtocol getTransferProtocol() {
+        return transferProtocol;
     }
 
     public byte[] getBytes() throws IOException {
