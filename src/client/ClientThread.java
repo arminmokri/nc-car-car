@@ -12,6 +12,7 @@ import client.parameters.Parameters;
 import client.request.Request;
 import client.response.Response;
 import client.response.ResponseThread;
+import client.transfer.udp.Udp;
 import config.Car;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +34,7 @@ public class ClientThread extends Thread {
     private Vector<Response> responses;
     //
     private TcpThread tcpThread;
+    private Udp udp;
     //
     private boolean Running;
     //
@@ -48,6 +50,7 @@ public class ClientThread extends Thread {
         responses = new Vector<>();
         //
         tcpThread = new TcpThread(ServerIP, ServerPort, dataInputs, getName());
+        udp = new Udp(ServerIP, 10000, dataInputs, getName());
         //
         HeartBeat = new Timer(1000, new ActionListener() {
             @Override
@@ -199,12 +202,21 @@ public class ClientThread extends Thread {
     public void Request(Request request) {
         try {
             dataOutputWrite(request.getTransferProtocol(), request.getBytes());
+            requests.add(request);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
 
-    public void dataOutputWrite(TransferProtocol transferProtocol, byte[] bytes) throws IOException, Exception {
+    public void Response(Response response) {
+        try {
+            dataOutputWrite(response.getTransferProtocol(), response.getBytes());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void dataOutputWrite(TransferProtocol transferProtocol, byte[] bytes) throws IOException, Exception {
         if (transferProtocol.equals(TransferProtocol.TCP)) {
             tcpThread.dataOutputStreamWrite(bytes);
         } else if (transferProtocol.equals(TransferProtocol.UDP)) {
