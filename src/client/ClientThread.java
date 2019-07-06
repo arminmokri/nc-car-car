@@ -12,7 +12,6 @@ import client.parameters.Parameters;
 import client.request.Request;
 import client.response.Response;
 import client.response.ResponseThread;
-import client.transfer.udp.Udp;
 import config.Car;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,7 +33,6 @@ public class ClientThread extends Thread {
     private Vector<Response> responses;
     //
     private TcpThread tcpThread;
-    private Udp udp;
     //
     private boolean Running;
     //
@@ -50,7 +48,6 @@ public class ClientThread extends Thread {
         responses = new Vector<>();
         //
         tcpThread = new TcpThread(ServerIP, ServerPort, dataInputs, getName());
-        udp = new Udp(ServerIP, 10000, dataInputs, getName());
         //
         HeartBeat = new Timer(1000, new ActionListener() {
             @Override
